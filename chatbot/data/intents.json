@@ -1,0 +1,28 @@
+{"intents": [
+        {"tag": "what_is_passman",
+         "patterns": ["what is passman?"],
+         "responses": ["Thew new system, call 'Passman' is the new password manager system that allowed users to store, manager password as well as manage OTP."],
+         "links": ["google.com"]
+        },
+        {"tag": "what_can_you_do_with_passman",
+         "patterns": ["What can you do with Passman?", "i want to managed/save my password", "password manager"],
+         "responses": ["- Manage and access all password. - Manage and access your OTP code. - Secure all your password."],
+         "links": ["google.com"]
+        },
+        {"tag": "how_to_use_passman",
+         "patterns": ["How to use Passman?", "how to managed password?", "how can i managed password?"],
+         "responses": ["Step 1: access Passman with this link. http://abc.com. Step 2: enter your email and password."],
+         "links": ["google.com"]
+        },
+        {"tag": "other_features_passman",
+         "patterns": ["Other features passman"],
+         "responses": ["Changing WebUI Language to JP or Vn."],
+         "links": ["google.com"]
+        },
+        {"tag": "settings_passman",
+         "patterns": ["Settings passman"],
+         "responses": ["To acces other settings, click on setting."],
+         "links": ["google.com"]
+        }
+   ]
+}
