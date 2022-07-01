@@ -22,12 +22,19 @@ nltk.download('omw-1.4')
 
 lemmatizer: WordNetLemmatizer = WordNetLemmatizer()
 
-nltk.download('punkt')
-nltk.download('wordnet')
-nltk.download('omw-1.4')
-
-
 s3 = boto3.client('s3')
+
+
+def loadS3IntentData():
+    bucket = "chatbot-training-data-demo1"
+    response = s3.list_objects_v2(Bucket=bucket)
+    files = response.get("Contents")
+    trainData = []
+    for file in files:
+        obj = s3.get_object(Bucket=bucket, Key=file['Key'])
+        j = json.loads(obj['Body'].read())
+        trainData.extend(j['intents'])
+    return trainData
 
 
 def loadDataFromS3():
@@ -36,7 +43,6 @@ def loadDataFromS3():
 
     chat_model = 'model/chatbot_model.h5'
     data_classes = 'data/classes.pkl'
-    data_intents = 'data/intents.json'
     data_words = 'data/words.pkl'
 
     s3.download_file(
@@ -50,18 +56,13 @@ def loadDataFromS3():
         data_classes
     )
     s3.download_file(
-        training_bucket,
-        data_intents,
-        data_intents
-    )
-    s3.download_file(
         bucket,
         data_words,
         data_words
     )
 
     model = load_model('model/chatbot_model.h5')
-    intents = json.loads(open('data/intents.json').read())
+    intents = loadS3IntentData()
     words = pickle.load(open('data/words.pkl', 'rb'))
     classes = pickle.load(open('data/classes.pkl', 'rb'))
     return model, intents, words, classes
@@ -71,7 +72,8 @@ def clean_up_sentence(sentence):
     # tokenize the pattern - split words into array
     sentence_words = nltk.word_tokenize(sentence)
     # stem each word - create short form for word
-    sentence_words = [lemmatizer.lemmatize(word.lower()) for word in sentence_words]
+    sentence_words = [lemmatizer.lemmatize(
+        word.lower()) for word in sentence_words]
     return sentence_words
 
 
@@ -109,10 +111,11 @@ def predict_class(sentence, _model, words, classes):
 def getResponse(ints, intents_json):
     result = ""
     tag = ints[0]['intent']
-    list_of_intents = intents_json['intents']
+    list_of_intents = intents_json
     for i in list_of_intents:
         if i['tag'] == tag:
-            result = random.choice(i['responses'])
+            result = i
+            # random.choice(i['responses'])
             break
     return result
 
@@ -124,9 +127,12 @@ def chatbot_response(text, model, intents, words, classes):
 
 
 # print(chatbot_response("can you show me the features of passman"))
-
-
 app = Flask(__name__)
+
+
+@app.route('/', methods=['GET'])
+def healthcheck():
+    return jsonify({"healthcheck": "good"})
 
 
 @app.route('/', methods=['POST'])
@@ -136,7 +142,7 @@ def update_record():
     print(data)
     question = data["question"]
     res = chatbot_response(question, model, intents, words, classes)
-    return jsonify({"answer": res, "question": question, "link": "google.com"})
+    return jsonify({"answer": random.choice(res['responses']), "question": question, "link": res['links']})
 
 
 app.run(host='0.0.0.0', port=3000)

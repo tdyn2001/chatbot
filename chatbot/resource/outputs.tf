@@ -9,3 +9,7 @@ output "training_repo_url" {
 output "training-service-log" {
   value = aws_cloudwatch_log_group.training-service-log.name
 }
+
+output "alb_hostname" {
+  value = aws_alb.main.dns_name
+}

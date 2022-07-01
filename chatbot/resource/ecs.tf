@@ -45,8 +45,9 @@ resource "aws_ecs_service" "training_service" {
 
   network_configuration {
     security_groups  = [aws_security_group.ecs_tasks.id]
-    subnets          = aws_subnet.private.*.id
-    assign_public_ip = false
+    subnets          = aws_subnet.public.*.id
+    # subnets          = aws_subnet.private.*.id
+    assign_public_ip = true
   }
 
   depends_on = [module.trainning_ecr_image]
@@ -101,5 +102,11 @@ resource "aws_ecs_service" "chatbot_service" {
     assign_public_ip = true
   }
 
-  depends_on = [module.chatbot_ecr_image]
+  load_balancer {
+    target_group_arn = aws_alb_target_group.app.id
+    container_name   = "chatbot_service"
+    container_port   = var.app_port
+  }
+
+  depends_on = [module.chatbot_ecr_image, aws_alb_listener.front_end]
 }

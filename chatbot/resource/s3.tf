@@ -22,7 +22,7 @@ module "s3_bucket_chatbot_traning" {
 
 }
 
-resource "aws_s3_bucket_object" "object" {
+resource "aws_s3_object" "object" {
   bucket = "chatbot-training-data-demo1"
   key    = "data/intents.json"
   source = "../data/intents.json"
