@@ -7,8 +7,8 @@ resource "aws_ecs_task_definition" "training_task_def" {
   task_role_arn            = aws_iam_role.ecs_task_role.arn
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   network_mode             = "awsvpc"
-  cpu                      = "256"
-  memory                   = "512"
+  cpu                      = var.training_fargate_cpu
+  memory                   = var.training_fargate_memory
   requires_compatibilities = ["FARGATE"]
 
   container_definitions = <<DEFINITION
@@ -59,8 +59,8 @@ resource "aws_ecs_task_definition" "chatbot_task_def" {
   task_role_arn            = aws_iam_role.ecs_task_role.arn
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   network_mode             = "awsvpc"
-  cpu                      = "512"
-  memory                   = "1024"
+  cpu                      = var.fargate_cpu
+  memory                   = var.fargate_memory
   requires_compatibilities = ["FARGATE","EC2"]
 
   container_definitions = <<DEFINITION
