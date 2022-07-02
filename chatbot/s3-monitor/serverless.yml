@@ -1,0 +1,27 @@
+service: s3-monitor
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: 'ap-southeast-1'
+  iam:
+    role: TestLambdaRole
+functions:
+  triggerOnUploadTrainingData:
+    handler: handler.hello
+    events:
+      - s3:
+          bucket: ${self:custom.bucket}
+          event: s3:ObjectCreated:*
+          existing: true
+          rules:
+            - suffix: .json
+
+resources:
+    Resources:
+      TestLambdaRole: ${file(./resource/LambdaRole.yml)}
+
+custom:
+    bucket: chatbot-training-data-demo1
